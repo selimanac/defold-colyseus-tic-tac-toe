@@ -1,0 +1,19 @@
+{
+  "name": "colyseus-starter",
+  "version": "1.0.0",
+  "description": "Colyseus Server - Minimal example",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./index.js",
+    "start-production": "node ./index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "colyseus": "^0.9.3",
+    "express": "^4.13.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  }
+}

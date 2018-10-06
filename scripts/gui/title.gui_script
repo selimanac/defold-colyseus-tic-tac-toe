@@ -1,0 +1,38 @@
+local start_btn
+local waiting_node 
+local touch = hash("touch")
+
+local game_controller = msg.url("container", hash("/game_controller"), "game_controller")
+local proxy_controller = msg.url("container", hash("/proxy"), "proxy_controller")
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	start_btn = gui.get_node("start_btn")
+	waiting_node  = gui.get_node("waiting")
+	gui.set_enabled(waiting_node, false)
+end
+
+function final(self)
+	msg.post(".", "release_input_focus")
+end
+
+local function on_fade_out(sender)
+	msg.post(proxy_controller, "load_game")
+end
+
+function on_message(self, message_id, message, sender)
+	pprint(message_id)
+	if message_id == hash("close_gui") then
+		-- fadeout	
+		on_fade_out(sender)
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id ==touch and gui.pick_node(start_btn, action.x, action.y) and action.pressed then
+		gui.set_enabled(waiting_node, true)
+		gui.set_enabled(start_btn, false)
+		msg.post(game_controller, "find_opt")
+	end
+end
+

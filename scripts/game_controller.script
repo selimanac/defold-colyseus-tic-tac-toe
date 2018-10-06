@@ -1,0 +1,33 @@
+function init(self)
+	-- Add initialization code here
+	-- Remove this function if not needed
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+local function find_opt(sender)
+	--find opt
+	
+	msg.post(sender, "close_gui")
+end
+
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("find_opt") then
+		find_opt(sender)
+	end
+end
+
+
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end

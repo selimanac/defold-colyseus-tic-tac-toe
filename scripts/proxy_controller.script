@@ -1,0 +1,31 @@
+local function load_title()
+	msg.post("/proxy#title_proxy", "load")
+end
+
+local function load_game()
+	msg.post("/proxy#title_proxy", "disable")
+	msg.post("/proxy#title_proxy", "final")
+	msg.post("/proxy#title_proxy", "unload")
+	msg.post("/proxy#game_proxy", "load")
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	load_title()
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then
+		msg.post(sender, "init")
+		msg.post(sender, "enable")
+	end
+
+	if message_id == hash("load_game") then
+		load_game()
+	end
+end
