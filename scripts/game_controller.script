@@ -1,33 +1,187 @@
+local ColyseusClient = require "colyseus.client"
+
+local server_adress = "localhost"
+local server_port = "3553"
+
+local client
+local room
+local numPlayers = 0
+local gui_controller = msg.url("game", hash("/gui"), "game")
+local isConnected = false
+
+-- Send server to selected tile's x, y
+local function onSelect(_x, _y)
+	room:send({x = _x, y = _y})
+end
+
+-- Show winner or loser on GUI
+local function showWinner(clientId)
+	room:leave()
+	local result = (room.sessionId == clientId) and true or false
+	msg.post(gui_controller, "Winners", {won = result})
+end
+
+-- Show draw on GUI
+local function drawGame()
+	room:leave()
+	msg.post(gui_controller, "Draw")
+end
+
+-- Change the turn on GUI
+local function nextTurn(self)
+	print("IN - currentTurn")
+	local result = (self.change_value == room.sessionId) and 1 or 0
+	msg.post(gui_controller, "ChangeTurn", {turn = result})
+end
+
+local function nextTurnOut(change_value)
+	print("IN - currentTurn")
+	local result = (change_value == room.sessionId) and 1 or 0
+	msg.post(gui_controller, "ChangeTurn", {turn = result})
+end
+
+-- When join completed start the game on GUI
+local function onJoin()
+	msg.post(gui_controller, "start_game")
+end
+
+
+-- #Join the room
+local function join_room(self)
+	-- Join Room
+	room = client:join("tictactoe")
+
+	room:on(
+		"join",
+		function()
+			print("client joined successfully")
+		end
+	)
+
+	-- Listen to room state changes from the room handler.
+	-- Use this method to synchronize the room state from the server with the clients.
+	room:listen(
+		"players/:id",
+		function(change)
+			print("players/:id")
+			numPlayers = numPlayers + 1
+			if numPlayers == 2 then
+				onJoin()
+
+				-- * There is a flow problem * -- 
+				nextTurnOut(change["path"]["id"]) -- Called second time here 
+			end
+		end
+	)
+
+	room:listen(
+		"currentTurn",
+		function(change)
+			-- * There is a flow problem * --
+			--self.change_value = change["value"]
+			--timer.delay(0.2, false, nextTurn) -- Must be delayed. Wait a few for Join to complete.
+			nextTurnOut(change["value"]) -- If join is not completed this doesn't work. Use delay ^
+		end
+	)
+
+	room:listen(
+		"board/:x/:y",
+		function(change)
+			if change["operation"] == "replace" then
+				msg.post(gui_controller, "ChangeTile", {change = change})
+			end
+		end
+	)
+
+	room:listen(
+		"draw",
+		function(change)
+			print("draw")
+			if change["operation"] == "add" then
+				drawGame()
+			end
+		end
+	)
+
+	room:listen(
+		"winner",
+		function(change)
+			if change["operation"] == "add" then
+				showWinner(change["value"])
+			end
+		end
+	)
+
+	room:on(
+		"error",
+		function(err)
+			print("oops, error ocurred:")
+			print(err)
+		end
+	)
+end
+
 function init(self)
-	-- Add initialization code here
-	-- Remove this function if not needed
+	-- Connect to WS
+	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port)
+
+	-- EVENTS
+	-- #open
+	client:on(
+		"open",
+		function()
+			isConnected = true
+			-- Join the room
+			join_room(self)
+		end
+	)
+
+	-- #message
+	client:on(
+		"message",
+		function(message)
+			print("message emitted")
+		end
+	)
+
+	-- #error
+	-- There is a problem, error doesn't emitted everytime: https://github.com/gamestdio/colyseus-defold/issues/6
+	client:on(
+		"error",
+		function(err)
+			print("error emitted")
+			isConnected = false
+			msg.post(gui_controller, "connection_fail")
+		end
+	)
+
+	-- #close
+	client:on(
+		"close",
+		function()
+			print("connection has been closed")
+			msg.post(gui_controller, "connection_fail")
+		end
+	)
 end
 
 function final(self)
-	-- Add finalization code here
-	-- Remove this function if not needed
-end
-
-function update(self, dt)
-	-- Add update code here
-	-- Remove this function if not needed
-end
-local function find_opt(sender)
-	--find opt
-	
-	msg.post(sender, "close_gui")
-end
-
-
-function on_message(self, message_id, message, sender)
-	if message_id == hash("find_opt") then
-		find_opt(sender)
+	if isConnected then
+		-- Clean it up
+		room:leave()
+		client:close()
+		client = nil
+		room = nil
 	end
 end
 
+function update(self, dt)
+	-- #loop ?
+	client:loop()
+end
 
-
-function on_reload(self)
-	-- Add reload-handling code here
-	-- Remove this function if not needed
+function on_message(self, message_id, message, sender)
+	if message_id == hash("SetTile") then
+		onSelect(message.x, message.y)
+	end
 end

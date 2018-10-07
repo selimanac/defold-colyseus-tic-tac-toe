@@ -1,26 +1,51 @@
+-- VARS
 local timer_max = 11
 local current_time = 11
 local countdown_timer = 0
 local grid_lenght = 9
 local grid = {}
 local touch = hash("touch")
-local timer_node
-local game_controller = msg.url("game", hash("/script"), "game")
 local is_game_started = false
+
+-- NODES
 local waiting_txt_node
 local turn_txt_node
+local timer_node
+local waiting_box_node 
+local retry_btn_node
+local result_box_node
+local result_txt_node
+local replay_btn_node
+
+-- URLS
+local game_controller = msg.url("game", hash("/script"), "game_controller")
+local proxy_controller = msg.url("container", hash("/proxy"), "proxy_controller")
+
 
 function init(self)
-	--	msg.post(receiver, "acquire_input_focus")
-
 	waiting_txt_node = gui.get_node("waiting_txt")
+	waiting_box_node = gui.get_node("waiting_box")
 	timer_node = gui.get_node("timer_txt")
 	turn_txt_node = gui.get_node("turn_txt")
+	retry_btn_node = gui.get_node("retry_btn")
+	result_box_node = gui.get_node("result_box")
+	result_txt_node = gui.get_node("result_txt")
+	replay_btn_node = gui.get_node("replay_btn")
+
+	gui.set_enabled(retry_btn_node, false)
+	gui.set_enabled(timer_node, false)
+	gui.set_enabled(result_box_node, false)
+	gui.set_enabled(replay_btn_node, false)
+	
+	gui.animate(waiting_box_node, "color.w", 0.7, gui.EASING_OUTSINE, 0.5)
+	gui.animate(waiting_txt_node, "color.w", 1, gui.EASING_OUTSINE, 0.3, 0.2)
+	gui.animate(waiting_txt_node, "scale", vmath.vector3(1, 1, 1), gui.EASING_OUTSINE, 0.3, 0.2)	
 
 	local grid_node
 	local text_node
 	local tile = {}
 
+	-- 3x3 Grid	
 	local i = 1
 	for _x = 0, 2 do
 		for _y = 0, 2 do
@@ -38,15 +63,10 @@ function init(self)
 			i = i + 1
 		end
 	end
-	pprint(grid)
-end
-
-function final(self)
 end
 
 local function change_turn(turn)
 	current_time = timer_max
-
 	if turn == 1 then
 		msg.post(".", "acquire_input_focus")
 		gui.set_text(turn_txt_node, "Your move!")
@@ -57,14 +77,21 @@ local function change_turn(turn)
 end
 
 local function start_game()
-	msg.post(".", "acquire_input_focus")
+	gui.set_enabled(waiting_box_node, false)
 	gui.set_enabled(waiting_txt_node, false)
-	gui.set_text(turn_txt_node, "Your move!")
+	gui.set_text(turn_txt_node, "")
 	is_game_started = true
+	gui.set_enabled(timer_node, true)
 end
 
-local function failed()
+local function restart_game()
+	msg.post(proxy_controller, "reload_game")
+end
+
+local function connection_failed()
+	msg.post(".", "acquire_input_focus")
 	gui.set_text(waiting_txt_node, "Couldn't connect.")
+	gui.set_enabled(retry_btn_node, true)
 end
 
 function update(self, dt)
@@ -95,24 +122,43 @@ local function change_tile(change)
 	end
 end
 
-local function show_result(won)
+local function show_result(won,draw)
 	is_game_started = false
-	gui.set_enabled(waiting_txt_node, true)
-	local result = won and "You win!" or "You Lose!"
-	gui.set_text(waiting_txt_node, result)
+
+	local grid_node = gui.get_node("grid")
+	local time_node = gui.get_node("time")
+	gui.set_enabled(grid_node, false)
+	gui.set_enabled(turn_txt_node, false)
+	gui.set_enabled(timer_node, false)
+	gui.set_enabled(time_node, false)
+
+	local result =""	
+	if draw then
+		 result = "Draw Game!"
+	else
+		 result = won and "You win!" or "You Lose!"
+	end
+	msg.post(".", "acquire_input_focus")
+	gui.set_text(result_txt_node, result)
+	gui.set_enabled(result_box_node, true)
+	gui.set_enabled(replay_btn_node, true)	
 end
+
+
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start_game") then
 		start_game()
 	elseif message_id == hash("connection_fail") then
-		failed()
+		connection_failed()
 	elseif message_id == hash("ChangeTurn") then
 		change_turn(message.turn)
 	elseif message_id == hash("ChangeTile") then
 		change_tile(message.change)
 	elseif message_id == hash("Winners") then
-		show_result(message.won)
+		show_result(message.won, false)
+	elseif message_id == hash("Draw") then
+		show_result(nil, true)
 	end
 end
 
@@ -123,9 +169,12 @@ function on_input(self, action_id, action)
 			msg.post(game_controller, "SetTile", {x = v["x"], y = v["y"]})
 		end
 	end
-end
 
-function on_reload(self)
-	-- Add input-handling code here
-	-- Remove this function if not needed
+	if action_id == touch and gui.is_enabled(replay_btn_node) and gui.pick_node(replay_btn_node, action.x, action.y) then
+		restart_game()
+	end
+
+	if action_id == touch and gui.is_enabled(retry_btn_node) and gui.pick_node(retry_btn_node, action.x, action.y) then
+		restart_game()
+	end
 end

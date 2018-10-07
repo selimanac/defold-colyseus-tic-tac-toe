@@ -1,6 +1,6 @@
 font: "/assets/fonts/JennaSue.ttf"
 material: "/builtins/fonts/font.material"
-size: 80
+size: 100
 antialias: 1
 alpha: 1.0
 outline_alpha: 0.0
