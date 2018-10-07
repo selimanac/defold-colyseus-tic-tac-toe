@@ -29,13 +29,11 @@ end
 
 -- Change the turn on GUI
 local function nextTurn(self)
-	print("IN - currentTurn")
 	local result = (self.change_value == room.sessionId) and 1 or 0
 	msg.post(gui_controller, "ChangeTurn", {turn = result})
 end
 
 local function nextTurnOut(change_value)
-	print("IN - currentTurn")
 	local result = (change_value == room.sessionId) and 1 or 0
 	msg.post(gui_controller, "ChangeTurn", {turn = result})
 end
@@ -44,7 +42,6 @@ end
 local function onJoin()
 	msg.post(gui_controller, "start_game")
 end
-
 
 -- #Join the room
 local function join_room(self)
@@ -60,6 +57,7 @@ local function join_room(self)
 
 	-- Listen to room state changes from the room handler.
 	-- Use this method to synchronize the room state from the server with the clients.
+
 	room:listen(
 		"players/:id",
 		function(change)
@@ -67,7 +65,6 @@ local function join_room(self)
 			numPlayers = numPlayers + 1
 			if numPlayers == 2 then
 				onJoin()
-
 				-- * There is a flow problem * -- 
 				nextTurnOut(change["path"]["id"]) -- Called second time here 
 			end
@@ -126,6 +123,7 @@ function init(self)
 	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port)
 
 	-- EVENTS
+
 	-- #open
 	client:on(
 		"open",
@@ -145,7 +143,7 @@ function init(self)
 	)
 
 	-- #error
-	-- There is a problem, error doesn't emitted everytime: https://github.com/gamestdio/colyseus-defold/issues/6
+	-- There is a problem, error doesn't emitted on init: https://github.com/gamestdio/colyseus-defold/issues/6
 	client:on(
 		"error",
 		function(err)

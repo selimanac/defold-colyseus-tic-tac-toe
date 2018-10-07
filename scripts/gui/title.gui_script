@@ -1,7 +1,9 @@
+-- NODES
 local start_btn_node
 local game_logo_node
 local coly_logo_node
 
+-- VARS
 local touch = hash("touch")
 local proxy_controller = msg.url("container", hash("/proxy"), "proxy_controller")
 
@@ -15,7 +17,7 @@ end
 
 local function disable_gui()
 	msg.post(".", "release_input_focus")
-
+	
 	gui.animate(start_btn_node, "color.w", 0, gui.EASING_OUTSINE, 0.2, 0.1)
 	gui.animate(start_btn_node, "scale", vmath.vector3(1.2, 1.2, 1), gui.EASING_OUTSINE, 0.2)	
 	gui.animate(game_logo_node, "color.w", 0, gui.EASING_OUTSINE, 0.3, 0.1)
@@ -26,7 +28,7 @@ function init(self)
 	start_btn_node = gui.get_node("start_btn")
 	game_logo_node  = gui.get_node("game_logo")
 	coly_logo_node = gui.get_node("coly_logo")
-	
+
 	gui.animate(game_logo_node, "color.w", 1, gui.EASING_OUTSINE, 0.2)
 	gui.animate(coly_logo_node, "color.w", 1, gui.EASING_OUTSINE, 0.2)
 	gui.animate(start_btn_node, "color.w", 1, gui.EASING_OUTSINE, 0.2, 0.5)

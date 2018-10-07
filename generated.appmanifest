@@ -1,0 +1,61 @@
+# App manifest generated Sun Oct 07 2018 21:05:14 GMT+0300 (GMT+03:00)
+# Settings: Physics,Record,Profiler,Facebook,Sound,Release,Clang
+platforms:
+    x86_64-osx:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
+    x86_64-linux:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
+    js-web:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
+    x86-win32:
+        context:
+            excludeLibs: ["libBulletDynamics","libBulletCollision","libLinearMath","libBox2D","libphysics","librecord","vpx","libprofilerext","libsound","libtremolo","libengine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["libengine_release.lib","libphysics_null.lib","librecord_null.lib","libsound_null.lib"]
+            linkFlags: []
+            use-clang: true
+
+    x86_64-win32:
+        context:
+            excludeLibs: ["libBulletDynamics","libBulletCollision","libLinearMath","libBox2D","libphysics","librecord","vpx","libprofilerext","libsound","libtremolo","libengine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["libengine_release.lib","libphysics_null.lib","librecord_null.lib","libsound_null.lib"]
+            linkFlags: []
+            use-clang: true
+
+    armv7-android:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
+    armv7-ios:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
+    arm64-ios:
+        context:
+            excludeLibs: ["BulletDynamics","BulletCollision","LinearMath","Box2D","physics","record","vpx","profilerext","sound","tremolo","engine"]
+            excludeSymbols: ["ProfilerExt","FacebookExt","DefaultSoundDevice","AudioDecoderWav","AudioDecoderStbVorbis","AudioDecoderTremolo"]
+            libs: ["engine_release","physics_null","record_null","sound_null"]
+            linkFlags: []
+
