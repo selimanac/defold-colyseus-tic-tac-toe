@@ -11,7 +11,7 @@ local is_game_started = false
 local waiting_txt_node
 local turn_txt_node
 local timer_node
-local waiting_box_node 
+local waiting_box_node
 local retry_btn_node
 local result_box_node
 local result_txt_node
@@ -20,7 +20,6 @@ local replay_btn_node
 -- URLS
 local game_controller = msg.url("game", hash("/script"), "game_controller")
 local proxy_controller = msg.url("container", hash("/proxy"), "proxy_controller")
-
 
 function init(self)
 	waiting_txt_node = gui.get_node("waiting_txt")
@@ -36,16 +35,16 @@ function init(self)
 	gui.set_enabled(timer_node, false)
 	gui.set_enabled(result_box_node, false)
 	gui.set_enabled(replay_btn_node, false)
-	
+
 	gui.animate(waiting_box_node, "color.w", 0.7, gui.EASING_OUTSINE, 0.5)
 	gui.animate(waiting_txt_node, "color.w", 1, gui.EASING_OUTSINE, 0.3, 0.2)
-	gui.animate(waiting_txt_node, "scale", vmath.vector3(1, 1, 1), gui.EASING_OUTSINE, 0.3, 0.2)	
+	gui.animate(waiting_txt_node, "scale", vmath.vector3(1, 1, 1), gui.EASING_OUTSINE, 0.3, 0.2)
 
 	local grid_node
 	local text_node
 	local tile = {}
 
-	-- 3x3 Grid	
+	-- 3x3 Grid
 	local i = 1
 	for _x = 0, 2 do
 		for _y = 0, 2 do
@@ -122,7 +121,7 @@ local function change_tile(change)
 	end
 end
 
-local function show_result(won,draw)
+local function show_result(won, draw)
 	is_game_started = false
 
 	local grid_node = gui.get_node("grid")
@@ -132,19 +131,17 @@ local function show_result(won,draw)
 	gui.set_enabled(timer_node, false)
 	gui.set_enabled(time_node, false)
 
-	local result =""	
+	local result = ""
 	if draw then
-		 result = "Draw Game!"
+		result = "Draw Game!"
 	else
-		 result = won and "You win!" or "You Lose!"
+		result = won and "You win!" or "You Lose!"
 	end
 	msg.post(".", "acquire_input_focus")
 	gui.set_text(result_txt_node, result)
 	gui.set_enabled(result_box_node, true)
-	gui.set_enabled(replay_btn_node, true)	
+	gui.set_enabled(replay_btn_node, true)
 end
-
-
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start_game") then

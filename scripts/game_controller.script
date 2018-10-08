@@ -1,8 +1,10 @@
 local ColyseusClient = require "colyseus.client"
 
+-- SERVER VARS
 local server_adress = "localhost"
 local server_port = "3553"
 
+--VARS
 local client
 local room
 local numPlayers = 0
@@ -27,12 +29,13 @@ local function drawGame()
 	msg.post(gui_controller, "Draw")
 end
 
--- Change the turn on GUI
+-- Change the turn on GUI ** using self for timer, see down below
 local function nextTurn(self)
 	local result = (self.change_value == room.sessionId) and 1 or 0
 	msg.post(gui_controller, "ChangeTurn", {turn = result})
 end
 
+-- Change the turn on GUI ** without timer, see down below
 local function nextTurnOut(change_value)
 	local result = (change_value == room.sessionId) and 1 or 0
 	msg.post(gui_controller, "ChangeTurn", {turn = result})
@@ -65,8 +68,8 @@ local function join_room(self)
 			numPlayers = numPlayers + 1
 			if numPlayers == 2 then
 				onJoin()
-				-- * There is a flow problem * -- 
-				nextTurnOut(change["path"]["id"]) -- Called second time here 
+				-- * There is a flow problem * --
+				nextTurnOut(change["path"]["id"]) -- Called second time here
 			end
 		end
 	)
@@ -143,7 +146,7 @@ function init(self)
 	)
 
 	-- #error
-	-- There is a problem, error doesn't emitted on init: https://github.com/gamestdio/colyseus-defold/issues/6
+	-- There is a problem, sometimes error doesn't emitted on closed connection: https://github.com/gamestdio/colyseus-defold/issues/6
 	client:on(
 		"error",
 		function(err)
@@ -165,7 +168,7 @@ end
 
 function final(self)
 	if isConnected then
-		-- Clean it up
+		-- If there is a active connection then clean it up
 		room:leave()
 		client:close()
 		client = nil
@@ -174,7 +177,7 @@ function final(self)
 end
 
 function update(self, dt)
-	-- #loop ?
+	-- #loop ? There isn't any documentation on colyseus docs about loop.
 	client:loop()
 end
 
