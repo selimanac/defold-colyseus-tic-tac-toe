@@ -123,7 +123,7 @@ end
 
 function init(self)
 	-- Connect to WS
-	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port)
+	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port, false ) -- false: not to connect immediately
 
 	-- EVENTS
 
@@ -146,7 +146,7 @@ function init(self)
 	)
 
 	-- #error
-	-- There is a problem, sometimes error doesn't emitted on closed connection: https://github.com/gamestdio/colyseus-defold/issues/6
+	-- Fixed: There is a problem, sometimes error doesn't emitted on closed connection: https://github.com/gamestdio/colyseus-defold/issues/6
 	client:on(
 		"error",
 		function(err)
@@ -164,6 +164,9 @@ function init(self)
 			msg.post(gui_controller, "connection_fail")
 		end
 	)
+
+	client:connect() -- manually connect after registering the listeners
+	
 end
 
 function final(self)
