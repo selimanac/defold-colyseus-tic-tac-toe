@@ -12,7 +12,7 @@ height = 640
 [project]
 title = tic-tac-toe
 dependencies = https://github.com/gamestdio/colyseus-defold/archive/master.zip,https://github.com/britzl/defold-websocket/archive/master.zip,https://www.github.com/britzl/defold-luasocket/archive/master.zip,https://github.com/britzl/defold-luasec/archive/master.zip,https://github.com/britzl/defold-orthographic/archive/master.zip
-version = 0.95
+version = 0.96
 
 [library]
 include_dirs = 

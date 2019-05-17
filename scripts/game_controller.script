@@ -29,13 +29,7 @@ local function drawGame()
 	msg.post(gui_controller, "Draw")
 end
 
--- Change the turn on GUI ** using self for timer, see down below
-local function nextTurn(self)
-	local result = (self.change_value == room.sessionId) and 1 or 0
-	msg.post(gui_controller, "ChangeTurn", {turn = result})
-end
-
--- Change the turn on GUI ** without timer, see down below
+-- Change the turn on GUI
 local function nextTurnOut(change_value)
 	local result = (change_value == room.sessionId) and 1 or 0
 	msg.post(gui_controller, "ChangeTurn", {turn = result})
@@ -49,14 +43,12 @@ end
 local function on_room_connected(self)
 	--Listen to room state changes from the room handler.
 	--Use this method to synchronize the room state from the server with the clients.
-
 	room:listen(
 		"players/:id",
 		function(change)
 			numPlayers = numPlayers + 1
 			if numPlayers == 2 then
 				onJoin()
-				-- * There is a flow problem * --
 				nextTurnOut(change["path"]["id"]) -- Called second time here
 			end
 		end
@@ -65,10 +57,7 @@ local function on_room_connected(self)
 	room:listen(
 		"currentTurn",
 		function(change)
-			-- * There is a flow problem * --
-			--self.change_value = change["value"]
-			--timer.delay(0.2, false, nextTurn) -- Must be delayed. Wait a few for Join to complete.
-			nextTurnOut(change["value"]) -- If join is not completed this doesn't work. Use delay ^
+			nextTurnOut(change["value"])
 		end
 	)
 
@@ -85,7 +74,7 @@ local function on_room_connected(self)
 		"draw",
 		function(change)
 			if change["operation"] == "add" then
-			--drawGame()
+				drawGame()
 			end
 		end
 	)
@@ -94,7 +83,7 @@ local function on_room_connected(self)
 		"winner",
 		function(change)
 			if change["operation"] == "add" then
-			--showWinner(change["value"])
+				showWinner(change["value"])
 			end
 		end
 	)
@@ -120,8 +109,6 @@ local function join_room(self)
 			on_room_connected(self)
 		end
 	)
-
-	
 end
 
 function init(self)
@@ -145,6 +132,7 @@ function init(self)
 		"message",
 		function(message)
 			print("message emitted")
+			pprint(message)
 		end
 	)
 

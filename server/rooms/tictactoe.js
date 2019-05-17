@@ -30,13 +30,14 @@ exports.TicTacToe = class extends colyseus.Room  {
   }
 
   onMessage(client, data) {
+   
     if (this.state.winner || this.state.draw) {
       return false;
     }
 
     if (client.sessionId === this.state.currentTurn) {
       if (this.state.board[data.x][data.y] === 0) {
-        let move = (client.playerIndex === 0) ? 'x' : 'o';
+        let move = (client.playerIndex === 0) ? '1' : '0';
         this.state.board[data.x][data.y] = move;
 
         if (this.checkWin(data.x, data.y, move)) {
