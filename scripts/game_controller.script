@@ -46,25 +46,13 @@ local function onJoin()
 	msg.post(gui_controller, "start_game")
 end
 
--- #Join the room
-local function join_room(self)
-	-- Join Room
-	room = client:join("tictactoe")
-
-	room:on(
-		"join",
-		function()
-			print("client joined successfully")
-		end
-	)
-
-	-- Listen to room state changes from the room handler.
-	-- Use this method to synchronize the room state from the server with the clients.
+local function on_room_connected(self)
+	--Listen to room state changes from the room handler.
+	--Use this method to synchronize the room state from the server with the clients.
 
 	room:listen(
 		"players/:id",
 		function(change)
-			print("players/:id")
 			numPlayers = numPlayers + 1
 			if numPlayers == 2 then
 				onJoin()
@@ -96,9 +84,8 @@ local function join_room(self)
 	room:listen(
 		"draw",
 		function(change)
-			print("draw")
 			if change["operation"] == "add" then
-				drawGame()
+			--drawGame()
 			end
 		end
 	)
@@ -107,7 +94,7 @@ local function join_room(self)
 		"winner",
 		function(change)
 			if change["operation"] == "add" then
-				showWinner(change["value"])
+			--showWinner(change["value"])
 			end
 		end
 	)
@@ -121,9 +108,25 @@ local function join_room(self)
 	)
 end
 
+-- #Join the room
+local function join_room(self)
+	-- Join Room
+	room = client:join("tictactoe")
+
+	room:on(
+		"join",
+		function()
+			print("client joined successfully")
+			on_room_connected(self)
+		end
+	)
+
+	
+end
+
 function init(self)
 	-- Connect to WS
-	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port, false ) -- false: not to connect immediately
+	client = ColyseusClient.new("ws://" .. server_adress .. ":" .. server_port, false) -- false: not to connect immediately
 
 	-- EVENTS
 
@@ -145,8 +148,6 @@ function init(self)
 		end
 	)
 
-	-- #error
-	-- Fixed: There is a problem, sometimes error doesn't emitted on closed connection: https://github.com/gamestdio/colyseus-defold/issues/6
 	client:on(
 		"error",
 		function(err)
@@ -166,7 +167,6 @@ function init(self)
 	)
 
 	client:connect() -- manually connect after registering the listeners
-	
 end
 
 function final(self)

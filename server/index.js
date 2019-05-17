@@ -1,15 +1,23 @@
-const colyseus = require('colyseus');
 const http = require('http');
-
 const express = require('express');
-const app = express();
+const colyseus = require('colyseus');
+const monitor = require("@colyseus/monitor").monitor;
+
+
+const TicTacToe = require('./rooms/tictactoe').TicTacToe;
+colyseus.serialize(colyseus.FossilDeltaSerializer)(TicTacToe);
+
 const port = process.env.PORT || 3553;
+const app = express()
 
 const server = http.createServer(app);
-const gameServer = new colyseus.Server({server: server});
+const gameServer = new colyseus.Server({ server });
 
-gameServer.register('tictactoe', require('./rooms/tictactoe'));
-server.listen(port);
+// register your room handlers
+gameServer.register('tictactoe', TicTacToe);
 
-app.use(express.static(__dirname + "/../frontend/public"));
-console.log(`Listening on ws://localhost:${ port }`);
+// Register colyseus monitor AFTER registering your room handlers
+app.use("/ws", monitor(gameServer));
+
+gameServer.listen(port);
+console.log(`Listening on ws://localhost:${ port }`)

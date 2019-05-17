@@ -7,5 +7,8 @@ Thumbs.db
 *.pyc
 .project
 .cproject
+.vscode
+/.vscode
 builtins
 /server/node_modules
+/server/package-lock.json

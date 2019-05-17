@@ -1,10 +1,10 @@
-const Room = require('colyseus').Room;
+const colyseus = require('colyseus');
 
 const TURN_TIMEOUT = 10
 
-module.exports = class TicTacToe extends Room {
+exports.TicTacToe = class extends colyseus.Room  {
 
-  onInit () {
+  onInit() {
     this.maxClients = 2;
 
     this.setState({
@@ -16,9 +16,9 @@ module.exports = class TicTacToe extends Room {
     })
   }
 
-  onJoin (client) {
+  onJoin(client) {
     client.playerIndex = Object.keys(this.state.players).length;
-    this.state.players[ client.sessionId ] = client.playerIndex;
+    this.state.players[client.sessionId] = client.playerIndex;
 
     if (this.clients.length == 2) {
       this.state.currentTurn = client.sessionId;
@@ -29,15 +29,15 @@ module.exports = class TicTacToe extends Room {
     }
   }
 
-  onMessage (client, data) {
+  onMessage(client, data) {
     if (this.state.winner || this.state.draw) {
       return false;
     }
 
     if (client.sessionId === this.state.currentTurn) {
-      if (this.state.board[ data.x ][ data.y ] === 0) {
+      if (this.state.board[data.x][data.y] === 0) {
         let move = (client.playerIndex === 0) ? 'x' : 'o';
-        this.state.board[ data.x ][ data.y ] = move;
+        this.state.board[data.x][data.y] = move;
 
         if (this.checkWin(data.x, data.y, move)) {
           this.state.winner = client.sessionId;
@@ -55,64 +55,64 @@ module.exports = class TicTacToe extends Room {
           if (this.randomMoveTimeout) {
             this.randomMoveTimeout.clear();
           }
-          this.randomMoveTimeout = this.clock.setTimeout(this.doRandomMove.bind(this, this.clients[ otherPlayerIndex ]), TURN_TIMEOUT * 1000);
+          this.randomMoveTimeout = this.clock.setTimeout(this.doRandomMove.bind(this, this.clients[otherPlayerIndex]), TURN_TIMEOUT * 1000);
         }
 
       }
     }
   }
 
-  checkBoardComplete () {
+  checkBoardComplete() {
     return this._flatten(this.state.board).
       filter(item => item === 0).length === 0;
   }
 
-  doRandomMove (client) {
-    for (let x=0; x<this.state.board.length; x++) {
-      for (let y=0; y<this.state.board[x].length; y++) {
-        if (this.state.board[x][y]===0) {
-          this.onMessage (client, { x: x, y: y });
+  doRandomMove(client) {
+    for (let x = 0; x < this.state.board.length; x++) {
+      for (let y = 0; y < this.state.board[x].length; y++) {
+        if (this.state.board[x][y] === 0) {
+          this.onMessage(client, { x: x, y: y });
           return;
         }
       }
     }
   }
 
-  checkWin (x, y, move) {
+  checkWin(x, y, move) {
     let won = false;
     let board = this.state.board;
     let boardSize = this.state.board.length;
 
     // horizontal
-    for(let i = 0; i < boardSize; i++){
+    for (let i = 0; i < boardSize; i++) {
       if (board[x][i] !== move) { break; }
-      if (i == boardSize-1) {
+      if (i == boardSize - 1) {
         won = true;
       }
     }
 
     // vertical
-    for(let i = 0; i < boardSize; i++){
+    for (let i = 0; i < boardSize; i++) {
       if (board[i][y] !== move) { break; }
-      if (i == boardSize-1) {
+      if (i == boardSize - 1) {
         won = true;
       }
     }
 
     // cross forward
-    if(x === y) {
-      for(let i = 0; i < boardSize; i++){
-        if(board[i][i] !== move) { break; }
-        if(i == boardSize-1) {
+    if (x === y) {
+      for (let i = 0; i < boardSize; i++) {
+        if (board[i][i] !== move) { break; }
+        if (i == boardSize - 1) {
           won = true;
         }
       }
     }
 
     // cross backward
-    for(let i = 0; i<boardSize; i++){
-      if(board[i][(boardSize-1)-i] !== move) { break; }
-      if(i == boardSize-1){
+    for (let i = 0; i < boardSize; i++) {
+      if (board[i][(boardSize - 1) - i] !== move) { break; }
+      if (i == boardSize - 1) {
         won = true;
       }
     }
@@ -120,8 +120,8 @@ module.exports = class TicTacToe extends Room {
     return won;
   }
 
-  onLeave (client) {
-    delete this.state.players[ client.sessionId ];
+  onLeave(client) {
+    delete this.state.players[client.sessionId];
 
     if (this.randomMoveTimeout) this.randomMoveTimeout.clear()
 
@@ -134,7 +134,7 @@ module.exports = class TicTacToe extends Room {
   _flatten(arr, previous) {
     let flattened = previous || []
 
-    for (let i=0; i<arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
       if (arr[i] instanceof Array) {
         this._flatten(arr[i], flattened)
 
@@ -147,4 +147,6 @@ module.exports = class TicTacToe extends Room {
   }
 
 }
+
+
 
