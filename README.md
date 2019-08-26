@@ -1,4 +1,6 @@
-## This version is archived. Recent version is available at https://github.com/endel/tic-tac-toe
+### This version is archived. Recent version is available at https://github.com/endel/tic-tac-toe
+
+---
 
 # Colyseus - Defold Tic Tac Toe Multiplayer Example
 
